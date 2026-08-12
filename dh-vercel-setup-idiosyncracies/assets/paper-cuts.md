@@ -206,6 +206,16 @@ Sources: CSV dashboard demo app, Eve PR-review agent build, demo-day diagram gen
 - **Symptom:** `pnpm install` was blocked by the org's supply-chain policy (`minimumReleaseAge`), which flagged several *pre-existing* lockfile entries (`@vercel/connect`, `ai`, …) as too-recently-published — unrelated to the change being made. The lockfile could not be refreshed.
 - **Workaround:** Don't bypass the policy. Ship without the lockfile refresh, note it in the PR, and re-run `pnpm install` once the flagged entries clear the release-age window (or from an unaffected environment).
 
+### Agent hands blocked commands back to the user instead of asking for approval
+- **Context:** Migrating a Slack agent to its own connector. The project was still attached to the old connector, so the agent answered every message twice.
+- **Symptom:** The agent stopped and printed "Two steps left for you", with `vercel connect detach slack/<name> --yes` for the user to run, explaining it was "blocked for me by the permission classifier". The user had asked the agent to do the work. The same pattern appeared earlier with `vercel connect remove` ("Why didn't you run this yourself?").
+- **Workaround:** Ask for approval in the chat, then run the command. Only a browser consent, a Passport-gated page, or a user-only decision justifies a hand-off. See the "How to act" section of the skill.
+
+### Two connectors attached to one project make the agent answer twice
+- **Context:** Giving a Slack agent its own connector (one connector per agent, rule 30) while the old shared connector was still attached.
+- **Symptom:** The project received the same Slack events from both Slack apps, so the agent replied twice to every message.
+- **Workaround:** `vercel connect detach slack/<connector-name> --yes` — this removes only this project's destination; other projects keep their attachment.
+
 ### Repos created outside the `dh-infra-poc` org can't deploy — and agents asked instead of defaulting
 - **Context:** Multiple onboarding sessions creating demo repos.
 - **Symptom:** Deploys only work for repos in the `dh-infra-poc` GitHub org; agents also wasted time asking users which org to use, and one nearly acted on the production `Delivery-Hero` org.
