@@ -1,6 +1,6 @@
 ---
 name: dh-vercel-setup-idiosyncracies
-description: Setup conventions and known paper cuts for Delivery Hero POC work on Vercel — the required toolchain (nvm/Node 24, pnpm), the dh-infra-poc org and dh-infra team rules, the PR-first workflow, eve for agents, plus workarounds for CLI linking/scoping, marketplace integrations, deployment policy, Deployment Protection/SSO/Passport, and Vercel Connect GitHub connectors. Use when you start a DH project, set up a machine, scaffold, link, provision integrations, deploy, or debug deployments, webhooks, or previews on a DH Vercel team — or when a Vercel CLI command stalls, errors, or behaves unexpectedly.
+description: Setup conventions and known paper cuts for Delivery Hero POC work on Vercel — the required toolchain (nvm/Node 24, pnpm), the dh-infra-poc org and dh-infra team rules, the PR-first workflow, eve for agents, connector rules (Jira, BigQuery, Slack), plus workarounds for CLI linking/scoping, marketplace integrations, deployment policy, Deployment Protection/SSO/Passport, and Vercel Connect GitHub connectors. Use when you start a DH project, set up a machine, scaffold, link, provision integrations, deploy, or debug deployments, webhooks, or previews on a DH Vercel team — or when a Vercel CLI command stalls, errors, or behaves unexpectedly.
 ---
 
 # Delivery Hero × Vercel setup idiosyncracies
@@ -85,10 +85,11 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 26. **v0 scaffolds ship `"lint": "eslint ."` without eslint installed** — gate on typecheck + build, or add eslint.
 27. **`pnpm install` can be blocked by the org's supply-chain policy (`minimumReleaseAge`)** flagging *pre-existing* lockfile entries (`@vercel/connect`, `ai`, …) as too-recently-published, even when your change didn't touch them. Don't bypass it — ship without the lockfile refresh and re-run `pnpm install` once the entries clear the window (or from an unaffected environment), noting it in the PR.
 
-## Connectors (Jira, BigQuery)
+## Connectors (Jira, BigQuery, Slack)
 
 28. **Jira: use the Atlassian MCP connector, not raw REST.** Call `https://mcp.atlassian.com/mcp` over the MCP protocol; do not integrate against the Jira REST API directly.
 29. **BigQuery: the connector is the okta-google one, not a plain Google connector** — DH access to BigQuery goes through Okta.
+30. **Slack: create one Slack connector per agent.** A Slack connector is a Slack app. A Slack app is one bot user with one `@handle`. Two agents on one connector share the same `@handle`, so a user cannot address them separately. This is the same constraint as the GitHub App slug in rule 18.
 
 ## Onboarding a new user or machine
 
