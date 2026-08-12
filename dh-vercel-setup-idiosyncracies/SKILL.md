@@ -90,6 +90,11 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 28. **Jira: use the Atlassian MCP connector, not raw REST.** Call `https://mcp.atlassian.com/mcp` over the MCP protocol; do not integrate against the Jira REST API directly.
 29. **BigQuery: the connector is the okta-google one, not a plain Google connector** — DH access to BigQuery goes through Okta.
 30. **Slack: create one Slack connector per agent.** A Slack connector is a Slack app. A Slack app is one bot user with one `@handle`. Two agents on one connector share the same `@handle`, so a user cannot address them separately. This is the same constraint as the GitHub App slug in rule 18.
+31. **Two connectors on one project make the agent answer twice.** The project gets the events from both Slack apps. Detach the old connector. This command removes only the destination of this project. Other projects keep their attachment.
+
+    ```bash
+    vercel connect detach slack/<connector-name> --yes
+    ```
 
 ## Onboarding a new user or machine
 
@@ -104,6 +109,13 @@ The agent can perform steps 1–3 itself when asked.
 **One step no agent or CLI can do:** the user's Vercel account must have a GitHub **Login Connection** before `vercel git connect` will work. It's a browser OAuth consent tied to the personal Vercel login — no CLI flag or API exists. Send the user to <https://vercel.com/account/settings/authentication> to sign in with GitHub (the same account authenticated in `gh`), then retry.
 
 **Environment paper cut:** Warp VPN interacts badly with Claude Code and blocks its requests — disconnect it if requests hang.
+
+## How to act
+
+- **Run the commands yourself. Do not give the user a list of steps to run.** The user asked you to do the work.
+- **A blocked permission is not a hand-off.** If the permission classifier blocks a command, ask the user for approval in the chat. Then run the command. Do not write "blocked for me — please run this".
+- **Only three things need the user.** A browser consent (see the GitHub Login Connection above and the AWS terms in rule 9), a Passport-gated page (rule 12), and a decision that only the user can make. Everything else is your work.
+- **Finish the task.** Do not stop at a plan. Do not stop after you find the cause. Apply the fix, then check the result on the preview deployment.
 
 ## How to answer
 
