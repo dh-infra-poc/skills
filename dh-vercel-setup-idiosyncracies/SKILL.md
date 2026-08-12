@@ -1,6 +1,6 @@
 ---
 name: dh-vercel-setup-idiosyncracies
-description: Known paper cuts and workarounds from setting up Vercel projects on Delivery Hero's enterprise teams (dh-infra) — CLI linking/scoping, marketplace integrations, deployment policy, Deployment Protection/SSO/Passport, Vercel Connect GitHub connectors, and eve agent deploys. Use when scaffolding, linking, provisioning integrations, deploying, or debugging deployments/webhooks/previews on a DH Vercel team, or when a Vercel CLI command stalls, errors, or behaves unexpectedly.
+description: Setup conventions and known paper cuts for Delivery Hero POC work on Vercel — the required toolchain (nvm/Node 24, pnpm), the dh-infra-poc org and dh-infra team rules, the PR-first workflow, eve for agents, plus workarounds for CLI linking/scoping, marketplace integrations, deployment policy, Deployment Protection/SSO/Passport, and Vercel Connect GitHub connectors. Use when you start a DH project, set up a machine, scaffold, link, provision integrations, deploy, or debug deployments, webhooks, or previews on a DH Vercel team — or when a Vercel CLI command stalls, errors, or behaves unexpectedly.
 ---
 
 # Delivery Hero × Vercel setup idiosyncracies
@@ -9,12 +9,35 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 
 ## Ground rules (non-negotiable)
 
-- **Only use the `dh-infra-poc` GitHub org.** NEVER touch the `Delivery-Hero` org. Repos created outside `dh-infra-poc` cannot be deployed on the team.
-- **Don't ask which org** — default to `dh-infra-poc` without prompting the user.
-- **Always create a PR instead of pushing to main.**
-- **Ship demos as Vercel deployments, not Claude artifacts.**
-- **Build all agents with eve** (Vercel's agent framework — see the eve skill/docs). No hand-rolled agent stacks.
-- **Always deploy on Vercel, on the `dh-infra` team.** GitHub repos live in `dh-infra-poc`; Vercel projects live in `dh-infra`.
+- **Use only the `dh-infra-poc` GitHub org.** Do NOT touch the `Delivery-Hero` org. You cannot deploy a repo from a different org.
+- **Do not ask which org.** Use `dh-infra-poc`.
+- **Create a PR. Do not push to main.** Push to main only if the user asks for it directly.
+- **Deploy on Vercel, on the `dh-infra` team.** GitHub repos go in `dh-infra-poc`. Vercel projects go in `dh-infra`.
+- **Deliver demos as Vercel deployments.** Do not deliver a Claude artifact.
+- **Build all agents with eve** (Vercel's agent framework). Do not build a custom agent stack.
+
+## Toolchain (same setup for all org members)
+
+- **Node 24 or later. Install it with nvm.**
+
+  ```bash
+  nvm install 24 && nvm use 24
+  ```
+
+- **Use pnpm. Set the minimum release age to 0.** The default policy blocks `pnpm install` on new package versions. See rule 27.
+
+  ```bash
+  pnpm config set minimumReleaseAge 0
+  ```
+
+## Project workflow
+
+1. **Create the GitHub repo first.** A repo in `dh-infra-poc` is necessary for a `dh-infra` deploy.
+2. **Type check after each change.** Make the type check a gate.
+3. **Write logs through all of the app.** Logs make the app easy to debug. Read the logs with `vercel logs` or the runtime-logs tool.
+4. **Keep the app debuggable behind Passport.** An agent cannot open a Passport-gated page. See rules 11–12.
+5. **Use the preview deployment to check the app.** Do not trust the local result only.
+6. **Open a PR.**
 
 ## Rules that prevent the most lost time
 
@@ -80,6 +103,11 @@ The agent can perform steps 1–3 itself when asked.
 **One step no agent or CLI can do:** the user's Vercel account must have a GitHub **Login Connection** before `vercel git connect` will work. It's a browser OAuth consent tied to the personal Vercel login — no CLI flag or API exists. Send the user to <https://vercel.com/account/settings/authentication> to sign in with GitHub (the same account authenticated in `gh`), then retry.
 
 **Environment paper cut:** Warp VPN interacts badly with Claude Code and blocks its requests — disconnect it if requests hang.
+
+## How to answer
+
+- **Write in ASD-STE100 Simplified Technical English.** Use short sentences. Use the active voice. Give one instruction per sentence. Many org members do not read English as a first language.
+- **Keep answers easy to scan.** Put the result first. Use short lists. Make the key command or file name easy to find. Do not write long blocks of text.
 
 ## Full log
 
