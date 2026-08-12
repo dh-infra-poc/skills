@@ -201,6 +201,11 @@ Sources: CSV dashboard demo app, Eve PR-review agent build, demo-day diagram gen
 - **Symptom:** With Warp VPN connected, Claude Code's requests are blocked/hang.
 - **Workaround:** Disconnect Warp while using Claude Code.
 
+### `pnpm install` blocked by org supply-chain policy on pre-existing lockfile entries
+- **Context:** Refreshing `pnpm-lock.yaml` after an unrelated code change on a teammate's machine.
+- **Symptom:** `pnpm install` was blocked by the org's supply-chain policy (`minimumReleaseAge`), which flagged several *pre-existing* lockfile entries (`@vercel/connect`, `ai`, …) as too-recently-published — unrelated to the change being made. The lockfile could not be refreshed.
+- **Workaround:** Don't bypass the policy. Ship without the lockfile refresh, note it in the PR, and re-run `pnpm install` once the flagged entries clear the release-age window (or from an unaffected environment).
+
 ### Repos created outside the `dh-infra-poc` org can't deploy — and agents asked instead of defaulting
 - **Context:** Multiple onboarding sessions creating demo repos.
 - **Symptom:** Deploys only work for repos in the `dh-infra-poc` GitHub org; agents also wasted time asking users which org to use, and one nearly acted on the production `Delivery-Hero` org.

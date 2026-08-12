@@ -13,6 +13,8 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 - **Don't ask which org** — default to `dh-infra-poc` without prompting the user.
 - **Always create a PR instead of pushing to main.**
 - **Ship demos as Vercel deployments, not Claude artifacts.**
+- **Build all agents with eve** (Vercel's agent framework — see the eve skill/docs). No hand-rolled agent stacks.
+- **Always deploy on Vercel, on the `dh-infra` team.** GitHub repos live in `dh-infra-poc`; Vercel projects live in `dh-infra`.
 
 ## Rules that prevent the most lost time
 
@@ -58,11 +60,12 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 24. **`import 'server-only'` breaks tsx/script execution** outside the Next.js bundler (module not found, then hard throw). Keep it out of modules that migrations/scripts import.
 25. **node-postgres returns SQL `DATE` as local-timezone JS `Date` objects** — string-comparison date logic fails silently. Override the pg type parser for `DATE` to return strings.
 26. **v0 scaffolds ship `"lint": "eslint ."` without eslint installed** — gate on typecheck + build, or add eslint.
+27. **`pnpm install` can be blocked by the org's supply-chain policy (`minimumReleaseAge`)** flagging *pre-existing* lockfile entries (`@vercel/connect`, `ai`, …) as too-recently-published, even when your change didn't touch them. Don't bypass it — ship without the lockfile refresh and re-run `pnpm install` once the entries clear the window (or from an unaffected environment), noting it in the PR.
 
 ## Connectors (Jira, BigQuery)
 
-27. **Jira: use the Atlassian MCP connector, not raw REST.** Call `https://mcp.atlassian.com/mcp` over the MCP protocol; do not integrate against the Jira REST API directly.
-28. **BigQuery: the connector is the okta-google one, not a plain Google connector** — DH access to BigQuery goes through Okta.
+28. **Jira: use the Atlassian MCP connector, not raw REST.** Call `https://mcp.atlassian.com/mcp` over the MCP protocol; do not integrate against the Jira REST API directly.
+29. **BigQuery: the connector is the okta-google one, not a plain Google connector** — DH access to BigQuery goes through Okta.
 
 ## Onboarding a new user or machine
 
