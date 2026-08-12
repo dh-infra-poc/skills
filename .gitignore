@@ -1,0 +1,5 @@
+# Local artifacts from `npx skills add` (the CLI self-installs skills into the cwd)
+.agents/
+.claude/
+skills-lock.json
+.DS_Store

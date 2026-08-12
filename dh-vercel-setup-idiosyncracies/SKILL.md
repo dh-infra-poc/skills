@@ -7,6 +7,13 @@ description: Known paper cuts and workarounds from setting up Vercel projects on
 
 Field notes from the DH POC (August 2026). These are real failures hit during setup, each with the working fix. Skim the rules below before running setup commands; consult [assets/paper-cuts.md](assets/paper-cuts.md) for the full log with exact error messages, context, and unresolved items.
 
+## Ground rules (non-negotiable)
+
+- **Only use the `dh-infra-poc` GitHub org.** NEVER touch the `Delivery-Hero` org. Repos created outside `dh-infra-poc` cannot be deployed on the team.
+- **Don't ask which org** — default to `dh-infra-poc` without prompting the user.
+- **Always create a PR instead of pushing to main.**
+- **Ship demos as Vercel deployments, not Claude artifacts.**
+
 ## Rules that prevent the most lost time
 
 ### CLI scoping — nothing defaults to the team you expect
@@ -51,6 +58,25 @@ Field notes from the DH POC (August 2026). These are real failures hit during se
 24. **`import 'server-only'` breaks tsx/script execution** outside the Next.js bundler (module not found, then hard throw). Keep it out of modules that migrations/scripts import.
 25. **node-postgres returns SQL `DATE` as local-timezone JS `Date` objects** — string-comparison date logic fails silently. Override the pg type parser for `DATE` to return strings.
 26. **v0 scaffolds ship `"lint": "eslint ."` without eslint installed** — gate on typecheck + build, or add eslint.
+
+## Connectors (Jira, BigQuery)
+
+27. **Jira: use the Atlassian MCP connector, not raw REST.** Call `https://mcp.atlassian.com/mcp` over the MCP protocol; do not integrate against the Jira REST API directly.
+28. **BigQuery: the connector is the okta-google one, not a plain Google connector** — DH access to BigQuery goes through Okta.
+
+## Onboarding a new user or machine
+
+Minimal setup, in order:
+
+1. Install the Vercel plugin for coding agents — <https://vercel.com/docs/agent-resources/vercel-plugin> (install choices: claude code / global / symlink).
+2. Install the Vercel CLI and log in.
+3. Log into GitHub in the terminal (`gh auth login`).
+
+The agent can perform steps 1–3 itself when asked.
+
+**One step no agent or CLI can do:** the user's Vercel account must have a GitHub **Login Connection** before `vercel git connect` will work. It's a browser OAuth consent tied to the personal Vercel login — no CLI flag or API exists. Send the user to <https://vercel.com/account/settings/authentication> to sign in with GitHub (the same account authenticated in `gh`), then retry.
+
+**Environment paper cut:** Warp VPN interacts badly with Claude Code and blocks its requests — disconnect it if requests hang.
 
 ## Full log
 

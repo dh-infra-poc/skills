@@ -2,7 +2,7 @@
 
 Every paper cut hit during the POC setup sessions (24h window, 2026-08-10 → 2026-08-11), verbatim from the session logs, grouped by area. Format: what we were doing, what broke, how we got past it.
 
-Sources: CSV dashboard demo app, Eve PR-review agent build, demo-day diagram generation, time-off app (DSQL layer + rollback-demo bug). (POC-alignment session sweep pending — added via PR when extracted.)
+Sources: CSV dashboard demo app, Eve PR-review agent build, demo-day diagram generation, time-off app (DSQL layer + rollback-demo bug), team onboarding Slack thread (2026-08-11). (POC-alignment session sweep pending — added via PR when extracted.)
 
 ---
 
@@ -186,6 +186,30 @@ Sources: CSV dashboard demo app, Eve PR-review agent build, demo-day diagram gen
 - **Context:** Referenced in the demo-day battle plan; the originating attempt was in another session.
 - **Symptom:** A first Vercel Agent code-review attempt failed or underwhelmed enough to pull it from the live demo lineup.
 - **Status:** Downgraded to a spoken mention; retry optional.
+
+---
+
+## Onboarding & environment (from the team onboarding thread, 2026-08-11)
+
+### `vercel git connect` blocked until the Vercel account has a GitHub Login Connection
+- **Context:** Onboarding a new team member; the Vercel project was created fine, but connecting the GitHub repo failed.
+- **Symptom:** Connecting the repo requires the personal Vercel account to have a GitHub Login Connection — and there is **no CLI flag or API** for it; it's a browser OAuth consent tied to the personal Vercel login, so the agent cannot do it on the user's behalf.
+- **Workaround:** The user signs in with GitHub at `https://vercel.com/account/settings/authentication` (same account authenticated in `gh`), then `vercel git connect` is retried and works.
+
+### Warp VPN + Claude Code interaction blocks requests
+- **Context:** New-machine onboarding.
+- **Symptom:** With Warp VPN connected, Claude Code's requests are blocked/hang.
+- **Workaround:** Disconnect Warp while using Claude Code.
+
+### Repos created outside the `dh-infra-poc` org can't deploy — and agents asked instead of defaulting
+- **Context:** Multiple onboarding sessions creating demo repos.
+- **Symptom:** Deploys only work for repos in the `dh-infra-poc` GitHub org; agents also wasted time asking users which org to use, and one nearly acted on the production `Delivery-Hero` org.
+- **Workaround:** Hard rule — only ever create repos in `dh-infra-poc`, never ask, never touch `Delivery-Hero`.
+
+### Demo shipped as a Claude artifact instead of a Vercel deployment
+- **Context:** Demo delivery during onboarding.
+- **Symptom:** The agent delivered the result as a Claude artifact when the expected deliverable was a deployed Vercel app.
+- **Workaround:** Standing instruction — ship demos as Vercel deployments.
 
 ---
 
